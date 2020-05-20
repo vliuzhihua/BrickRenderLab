@@ -1,21 +1,24 @@
 PROJECT(BrickGE)
 
+
 CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 set(CMAKE_VERBOSE_MAKEFILE on)
-AUX_SOURCE_DIRECTORY(client DIR_SRCS)
 
-MESSAGE(STATUS "CLIENT_DIR_SRCS::: \n" ${DIR_SRCS} )
+#AUX_SOURCE_DIRECTORY(client DIR_SRCS)
+#MESSAGE(STATUS "CLIENT_DIR_SRCS::: \n" ${DIR_SRCS} )
+
 #set(LIB_SRC rapidjson)
 
 #add_subdirectory(rapidjson)
 #add_library(rapidjson STATIC ${LIB_SRC})
-INCLUDE_DIRECTORIES(
-    inc
-)
+
+#aux_source_directory(. DIR_SRCS)
+#message(STATUS "client code: " "${DIR_SRCS}")
 
 add_definitions(-DUNICODE -D_UNICODE)
 
 add_subdirectory("glfw/glfw-3.2.1")
+add_subdirectory("tinyobjloader/tinyobjloader")
 add_subdirectory("client")
 
 #about d3d

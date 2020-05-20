@@ -1,0 +1,18 @@
+varying vec4 vPos;
+varying vec3 normal;
+varying vec3 eyeVec;
+varying vec3 lightVec;
+
+uniform mat4 matrixM;
+uniform vec4 eyePos;
+
+void main()
+{
+	normal = normalize(gl_NormalMatrix * gl_Normal);
+	vPos = gl_ModelViewMatrix * gl_Vertex;
+	lightVec = vec3(gl_ModelViewMatrix * vec4(0, 0, 0, 0));
+	eyeVec = vec3(gl_ModelViewMatrix * vec4(0, 0, 0, 0));
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	//gl_Position = ftransform();
+}	
+
