@@ -88,9 +88,15 @@ void SceneDisplay::setViewRotate(int state){
 void SceneDisplay::setShaderState(int state){
 
 	shaderState = state;
-	if(shaderState == 1 && shaderPro == -1){
-		vertexShader = loadShader("shaders\\shadow.vp", GL_VERTEX_SHADER);
-		fragShader = loadShader("shaders\\shadow.fp",GL_FRAGMENT_SHADER);
+	if(shaderState == 1){
+		if(shaderPro != -1)
+		{
+			glDeleteObjectARB(vertexShader);
+			glDeleteObjectARB(fragShader);
+			glDeleteProgram(shaderPro);
+		}
+		vertexShader = loadShader("shaders\\vertex.glsl", GL_VERTEX_SHADER);
+		fragShader = loadShader("shaders\\fragment.glsl",GL_FRAGMENT_SHADER);
 		shaderPro = linkToProgram(vertexShader, fragShader);
 	}
 }

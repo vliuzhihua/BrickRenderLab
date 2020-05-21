@@ -2,8 +2,7 @@
 //varying vec4 gl_Position;
 varying vec4 vPos;
 varying vec3 normal;
-varying vec3 lightVec;
-varying vec3 eyeVec;
+//varying vec3 eyeVec;
 
 vec4 getPhongLighting(vec3 vpos, vec3 n)
 {// just do color calculation in the phong`s way
@@ -13,6 +12,9 @@ vec4 getPhongLighting(vec3 vpos, vec3 n)
 	vec4 mat_specular = vec4(1.0, 1.0, 1.0, 1.0);
 	vec4 diffuse = vec4(0.0);
 	vec4 specular = vec4(0.0);
+
+	vec3 lightVec = vec3(1.0, 1.0, 1.0);
+	vec3 eyeVec = vec3(100.0, 0.0, 0.0);
 	// ambient term
 	vec4 ambient = mat_ambient * gl_LightSource[0].ambient;	
 	// diffuse color
@@ -41,6 +43,8 @@ void main()
  	vec4 color = vec4(1, 1, 1, 1.0);
 
 	gl_FragColor = color * getPhongLighting(vPos.xyz, normalize(normal));
+	gl_FragColor = vec4(normal, 0);
+	// gl_FragColor = 0.1;
 	//gl_FragColor = color * getPhongLighting(gl_Position.xyz, normalize(normal));
 }
 
