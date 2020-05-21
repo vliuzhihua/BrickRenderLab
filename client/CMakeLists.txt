@@ -6,9 +6,13 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 include_directories(include)
 
-aux_source_directory(. DIR_SRCS)
+
+# aux_source_directory(. DIR_SRCS)
+FILE(GLOB DIR_SRCS "*.cpp" "*.h")
 
 message("client code: " "${DIR_SRCS}")
+
+# source_group(md5 FILES ${MD5_FILE})
 
 link_directories(lib)
 
