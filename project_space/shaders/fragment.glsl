@@ -43,7 +43,7 @@ void main()
  	vec4 color = vec4(1, 1, 1, 1.0);
 
 	gl_FragColor = color * getPhongLighting(vPos.xyz, normalize(normal));
-	gl_FragColor = vec4(normal, 0);
+	//gl_FragColor = vec4(normal, 0);
 	// gl_FragColor = 0.1;
 	//gl_FragColor = color * getPhongLighting(gl_Position.xyz, normalize(normal));
 }

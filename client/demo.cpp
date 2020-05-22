@@ -39,7 +39,7 @@ void OneDisplay(){
 
 	//glDrawArrays(GL_QUADS, 0, attrib.vertices.size());
 	//glDrawBuffer(GL_QUADS);
-	glDrawElements(GL_TRIANGLE_STRIP, shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
 	//glDrawArrays(GL_TRIANGLES, 0, attrib.vertices.size());
 
 	glDisableClientState(GL_INDEX_ARRAY);
@@ -113,9 +113,20 @@ int main(){
 	glBindBuffer(GL_ARRAY_BUFFER, normalBO);
 	glBufferData(GL_ARRAY_BUFFER, attrib.normals.size() * sizeof(GLfloat), attrib.normals.data(), GL_STREAM_DRAW);
 
+	unsigned int* index = new unsigned int[shapes[0].mesh.indices.size()];
+	for (int i = 0; i < shapes[0].mesh.indices.size(); i++)
+	{
+		auto idx = shapes[0].mesh.indices[i];
+		if (idx.normal_index != idx.vertex_index)
+			int a = 10;
+		index[i] = shapes[0].mesh.indices[i].vertex_index;
+	}
+
 	glGenBuffers(1, &indexBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[0].mesh.indices.size() * sizeof(unsigned int), shapes[0].mesh.indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, shapes[0].mesh.indices.size() * sizeof(unsigned int), index, GL_STATIC_DRAW);
+
+	//shapes[0].mesh.indices[0].vertex_index
 	
 	
 	sceneDis.start();
