@@ -4,17 +4,16 @@ set(CMAKE_EXE_LINKER_FLAGS "/SAFESEH:NO")
 CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
-include_directories(include)
+include_directories("${ROOT_DIR}/3rdpartylib/GL/include")
+include_directories("${ROOT_DIR}/3rdpartylib")
+link_directories(${ROOT_DIR}/3rdpartylib/GL/lib)
 
-
-# aux_source_directory(. DIR_SRCS)
 FILE(GLOB DIR_SRCS "*.cpp" "*.h")
 
 message("client code: " "${DIR_SRCS}")
 
 # source_group(md5 FILES ${MD5_FILE})
 
-link_directories(lib)
 
 ADD_EXECUTABLE(client ${DIR_SRCS})
 
@@ -23,6 +22,7 @@ ADD_EXECUTABLE(client ${DIR_SRCS})
 target_link_libraries(client glfw)
 target_link_libraries(client opengl32)
 target_link_libraries(client tinyobjloader)
+#target_link_libraries(client eigen)
 
 
 target_link_libraries(client glew32)

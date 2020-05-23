@@ -4,22 +4,16 @@ PROJECT(BrickGE)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
-#AUX_SOURCE_DIRECTORY(client DIR_SRCS)
-#MESSAGE(STATUS "CLIENT_DIR_SRCS::: \n" ${DIR_SRCS} )
+set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-#set(LIB_SRC rapidjson)
-
-#add_subdirectory(rapidjson)
-#add_library(rapidjson STATIC ${LIB_SRC})
-
-#aux_source_directory(. DIR_SRCS)
-#message(STATUS "client code: " "${DIR_SRCS}")
+message(STATUS "ppppppppppp " ${ROOT_DIR})
 
 add_definitions(-DUNICODE -D_UNICODE)
 
-add_subdirectory("glfw/glfw-3.2.1")
-add_subdirectory("tinyobjloader/tinyobjloader")
+add_subdirectory("3rdpartylib/glfw/glfw-3.2.1")
+add_subdirectory("3rdpartylib/tinyobjloader/tinyobjloader")
 add_subdirectory("client")
+
 
 #about d3d
 # set(DXSDK_DIR "$ENV{DXSDK_DIR}")
@@ -37,16 +31,3 @@ add_subdirectory("client")
 
 # #link_directories和include_directories需要在add_executable之前!!!
 # ADD_EXECUTABLE(test_proj ${DIR_SRCS})
-
-# #target_link_libraries需要在add_executable之后!!!
-# TARGET_LINK_LIBRARIES(test_proj d3d9)
-# TARGET_LINK_LIBRARIES(test_proj d3dx9)
-# TARGET_LINK_LIBRARIES(test_proj dxerr)
-# TARGET_LINK_LIBRARIES(test_proj DXGI)
-# TARGET_LINK_LIBRARIES(test_proj DInput8)
-
-# target_link_libraries(test_proj dxguid)
-# TARGET_LINK_LIBRARIES(test_proj dxguid)
-# target_link_libraries(test_proj winmm)
-
-# target_link_libraries(test_proj legacy_stdio_definitions)

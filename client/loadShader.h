@@ -1,5 +1,5 @@
-#include<GL/glew.h>
-#include<GL/glut.h>
+#include<glew.h>
+#include<glut.h>
 #include<iostream>
 
 GLhandleARB linkToProgram(GLhandleARB vertexShader,  GLhandleARB fragShader){
