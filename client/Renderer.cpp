@@ -93,6 +93,8 @@ void Renderer::Render(const Camera& cam)
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 	glUniformMatrix4fv(glGetUniformLocation(shaderPro, "matrixM"), 1, 0, matrix);
 
+	//GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+
 	//Çå³ý»º³åÇøµÄ¡£
 	glClearColor(0.0, 0.0, 0.0, 255);
 	glEnable(GL_DEPTH_TEST);

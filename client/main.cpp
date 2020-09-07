@@ -8,6 +8,11 @@
 #include "Renderer.h"
 #include "Camera.h"
 
+#include "fstream"
+#include "string"
+
+#include "CImg/CImg.h"
+
 Renderer renderer;
 Camera camera;
 
@@ -86,8 +91,8 @@ static void mousebutton_callback(GLFWwindow* window, int button, int action, int
 
 int main()
 {
-	const int w = 640;
-	const int h = 480;
+	const int w = 1366;
+	const int h = 768;
 	GLFWwindow* window;
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit())
@@ -110,22 +115,30 @@ int main()
 	last_curx = w * 0.5;
 	last_cury = h * 0.5;
 
-	renderer.PrepareRender();
-	
-	while (!glfwWindowShouldClose(window))
-	{
-		float ratio;
-		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
 
-		renderer.OnWindowSizeChange(width, height);
-		renderer.Render(camera);
+	cimg_library::CImg<unsigned char> Img;
+	Img.load_bmp("res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
+	//Img.load_bmp("D:\\1_BrickGE\\project_space\\res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
+	//Img.load_jpeg("D:\\1_BrickGE\\project_space\\res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.jpg");
+	Img.display();
 
-		glfwSwapBuffers(window);
+	//renderer.PrepareRender();
+	//
+	//while (!glfwWindowShouldClose(window))
+	//{
+	//	float ratio;
+	//	int width, height;
+	//	glfwGetFramebufferSize(window, &width, &height);
 
-		glfwPollEvents();
-	}
-	glfwDestroyWindow(window);
-	glfwTerminate();
-	exit(EXIT_SUCCESS);
+	//	renderer.OnWindowSizeChange(width, height);
+	//	renderer.Render(camera);
+
+	//	glfwSwapBuffers(window);
+
+	//	glfwPollEvents();
+	//}
+	//glfwDestroyWindow(window);
+	//glfwTerminate();
+	//exit(EXIT_SUCCESS);
+
 }

@@ -10,6 +10,8 @@ message(STATUS "ppppppppppp " ${ROOT_DIR})
 
 add_definitions(-DUNICODE -D_UNICODE)
 
+# add_subdirectory("3rdpartylib/libjpeg-turbo")
+#add_subdirectory("3rdpartylib/libjpeg")
 add_subdirectory("3rdpartylib/glfw/glfw-3.2.1")
 add_subdirectory("3rdpartylib/tinyobjloader/tinyobjloader")
 add_subdirectory("client")
