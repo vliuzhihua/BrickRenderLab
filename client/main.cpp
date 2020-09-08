@@ -12,6 +12,7 @@
 #include "string"
 
 #include "CImg/CImg.h"
+#include "FreeImage.h"
 
 Renderer renderer;
 Camera camera;
@@ -117,10 +118,14 @@ int main()
 
 
 	cimg_library::CImg<unsigned char> Img;
-	Img.load_bmp("res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
+	//Img.load_bmp("res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
 	//Img.load_bmp("D:\\1_BrickGE\\project_space\\res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
 	//Img.load_jpeg("D:\\1_BrickGE\\project_space\\res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.jpg");
-	Img.display();
+	//Img.display();
+
+	FIBITMAP* file = FreeImage_Load(FREE_IMAGE_FORMAT::FIF_JPEG, "res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.jpg");
+	auto wf = FreeImage_GetWidth(file);
+	int a = 10;
 
 	//renderer.PrepareRender();
 	//
