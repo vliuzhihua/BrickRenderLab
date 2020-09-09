@@ -3,7 +3,7 @@
 #include <stdio.h>
 //#include <GL/gl.h>
 //#include <GL/glu.h>
-#include "glew.h"
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include "Renderer.h"
 #include "Camera.h"
@@ -90,6 +90,17 @@ static void mousebutton_callback(GLFWwindow* window, int button, int action, int
 	}
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+}
+
 int main()
 {
 	const int w = 1366;
@@ -98,6 +109,9 @@ int main()
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	window = glfwCreateWindow(w, h, "Simple example", NULL, NULL);
 	if (!window)
 	{
@@ -111,39 +125,43 @@ int main()
 	glfwSetCursorPosCallback(window, cursor_callback);
 
 	//glew must be initialized, ortherwise there will be some error when use some opengl function,such as glGenTexture
-	glewInit();
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
 
 	last_curx = w * 0.5;
 	last_cury = h * 0.5;
 
-
-	cimg_library::CImg<unsigned char> Img;
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	//cimg_library::CImg<unsigned char> Img;
 	//Img.load_bmp("res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
 	//Img.load_bmp("D:\\1_BrickGE\\project_space\\res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
 	//Img.load_jpeg("D:\\1_BrickGE\\project_space\\res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.jpg");
 	//Img.display();
 
-	FIBITMAP* file = FreeImage_Load(FREE_IMAGE_FORMAT::FIF_JPEG, "res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.jpg");
-	auto wf = FreeImage_GetWidth(file);
-	int a = 10;
 
-	//renderer.PrepareRender();
-	//
-	//while (!glfwWindowShouldClose(window))
-	//{
-	//	float ratio;
-	//	int width, height;
-	//	glfwGetFramebufferSize(window, &width, &height);
 
-	//	renderer.OnWindowSizeChange(width, height);
-	//	renderer.Render(camera);
+	renderer.PrepareRender();
+	
+	while (!glfwWindowShouldClose(window))
+	{
+		float ratio;
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
 
-	//	glfwSwapBuffers(window);
+		processInput(window);
 
-	//	glfwPollEvents();
-	//}
-	//glfwDestroyWindow(window);
-	//glfwTerminate();
-	//exit(EXIT_SUCCESS);
+		renderer.OnWindowSizeChange(width, height);
+		renderer.Render(camera);
 
+		glfwSwapBuffers(window);
+
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
+	exit(EXIT_SUCCESS);
 }

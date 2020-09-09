@@ -6,6 +6,7 @@ Personal Graphics Engine
 2. cmake(platform choose x32)
 3. open with visual studio
 4. set working directory to "project_space"
+5. set client as launch project
 
 ## library
 * Eigen

@@ -1,8 +1,11 @@
-
 //varying vec4 gl_Position;
 varying vec4 vPos;
 varying vec3 normal;
+varying vec2 uv;
 //varying vec3 eyeVec;
+varying vec3 VertexColor;
+
+uniform sampler2D tex1;
 
 vec4 getPhongLighting(vec3 vpos, vec3 n)
 {// just do color calculation in the phong`s way
@@ -44,6 +47,8 @@ void main()
 
 	gl_FragColor = color * getPhongLighting(vPos.xyz, normalize(normal));
 	gl_FragColor = vec4(normal, 0);
+	gl_FragColor = vec4(uv.x, uv.y, 1, 0);
+	gl_FragColor.xyz = VertexColor;
 	// gl_FragColor = 0.1;
 	//gl_FragColor = color * getPhongLighting(gl_Position.xyz, normalize(normal));
 }

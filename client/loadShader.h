@@ -1,19 +1,20 @@
-#include<glew.h>
-#include<glut.h>
+#include "glad/glad.h"
+//#include<glut.h>
 #include<iostream>
 
 GLhandleARB linkToProgram(GLhandleARB vertexShader,  GLhandleARB fragShader){
-	GLhandleARB shaderPro = glCreateProgramObjectARB();
-	glAttachObjectARB(shaderPro, vertexShader);
-	glAttachObjectARB(shaderPro, fragShader);
-	glLinkProgramARB(shaderPro);
+	GLhandleARB shaderPro = glCreateProgram();
+	//glAttachObjectARB(shaderPro, vertexShader);
+	glAttachShader(shaderPro, vertexShader);
+	glAttachShader(shaderPro, fragShader);
+	glLinkProgram(shaderPro);
 	GLint linked;
-	glGetProgramivARB(shaderPro, GL_LINK_STATUS, &linked);
-	//最初用来显示链接是否成功的。刘志华 2014.9.22
-	if(!linked){
-		printf("链接不成功\n");
-	}else{
-		printf("链接成功\n");
+	glGetProgramiv(shaderPro, GL_LINK_STATUS, &linked);
+
+	if (!linked) {
+		char InfoLog[512];
+		glGetProgramInfoLog(shaderPro, 512, NULL, InfoLog);
+		std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << InfoLog << std::endl;
 	}
 	return shaderPro;
 }
@@ -24,7 +25,7 @@ GLhandleARB loadShader(char* filename, unsigned int type)
 	const GLcharARB* files[1];
 	
 	// shader Compilation variable
-	GLint result;				// Compilation code result
+	GLint Success;				// Compilation code result
 	GLint errorLoglength ;
 	char* errorLogText;
 	GLsizei actualErrorLogLength;
@@ -43,35 +44,29 @@ GLhandleARB loadShader(char* filename, unsigned int type)
 	fread(buffer,sizeof(char),400000,pfile);
 	//printf("%s\n",buffer);
 	fclose(pfile);
-	handle = glCreateShaderObjectARB(type);
+	handle = glCreateShader(type);
 	if (!handle){
 		//We have failed creating the vertex shader object.
 		printf("Failed creating vertex shader object from file: %s.",filename);
 		exit(0);
 	}	
 	files[0] = (const GLcharARB*)buffer;
-	glShaderSourceARB(
+	glShaderSource(
 					  handle, //The handle to our shader
 					  1, //The number of files.
 					  files, //An array of const char * data, which represents the source code of theshaders
 					  NULL);	
-	glCompileShaderARB(handle);
+	glCompileShader(handle);
 	//Compilation checking.
-	glGetObjectParameterivARB(handle, GL_OBJECT_COMPILE_STATUS_ARB, &result);
+	glGetShaderiv(handle, GL_COMPILE_STATUS, &Success);
 	// If an error was detected.
-	if (!result)	{
+	if (!Success)	{
 		//We failed to compile.
+		char infoLog[512];
 		printf("Shader '%s' failed compilation.\n",filename);
 		//Attempt to get the length of our error log.
-		glGetObjectParameterivARB(handle, GL_OBJECT_INFO_LOG_LENGTH_ARB, &errorLoglength);
-		//Create a buffer to read compilation error message
-		errorLogText = (char *)malloc(sizeof(char) * errorLoglength);
-		//Used to get the final length of the log.
-		glGetInfoLogARB(handle, errorLoglength, &actualErrorLogLength, errorLogText);
-		// Display errors.
-		printf("%s\n",errorLogText);
-		// Free the buffer malloced earlier
-		free(errorLogText);
+		glGetShaderInfoLog(handle, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 	return handle;
 }

@@ -6,16 +6,16 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 
 set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-message(STATUS "ppppppppppp " ${ROOT_DIR})
+message(STATUS "ROOT_DIR " ${ROOT_DIR})
 
 add_definitions(-DUNICODE -D_UNICODE)
 
-# add_subdirectory("3rdpartylib/libjpeg-turbo")
-#add_subdirectory("3rdpartylib/libjpeg")
-add_subdirectory("3rdpartylib/glfw/glfw-3.2.1")
+add_subdirectory("3rdpartylib/glfw")
+add_subdirectory("3rdpartylib/glad")
 add_subdirectory("3rdpartylib/tinyobjloader/tinyobjloader")
 add_subdirectory("client")
 
+# create_target_group(3rdparty)
 
 #about d3d
 # set(DXSDK_DIR "$ENV{DXSDK_DIR}")
