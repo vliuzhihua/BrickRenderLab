@@ -59,6 +59,9 @@ void FShader::SetFloat(const std::string& Name, float Value) const
 {
     glUniform1f(glGetUniformLocation(ID, Name.c_str()), Value);
 }
+void FShader::SetMatrix4x4(const std::string& Name, float* Value) const {
+    glUniformMatrix4fv(glGetUniformLocation(ID, Name.c_str()), 1, false, Value);
+}
 
 bool FShader::CreateShader(GLuint ShaderType, const char* Path, GLuint& ShaderId) {
     std::string ShaderCode;

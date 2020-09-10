@@ -6,7 +6,8 @@
 #include "loadShader.h"
 #include "FreeImage.h"
 #include "glm/glm.hpp"
-#include <glm/ext/matrix_clip_space.hpp>
+//#include <glm/ext/matrix_clip_space.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 #include "Shader.h"
 
 GLuint vertexBO, texcoordBO, normalBO, indexBO, ColorBO;
@@ -106,40 +107,27 @@ void Renderer::Render(const Camera& cam)
 	FShader Shader("shaders\\test\\test_vertex.glsl", "shaders\\test\\test_frag.glsl");
 	Shader.Use();
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	//glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
 
 	//glCreateTextures()
-	//float ratio = m_window_width / (float)m_window_height;
+	float Ratio = m_window_width / (float)m_window_height;
 
-	//if (shaderPro != -1)
-	//{
-	//	glDeleteShader(vertexShader);
-	//	glDeleteShader(fragShader);
-	//	glDeleteProgram(shaderPro);
-	//}
-	//vertexShader = loadShader("shaders\\vertex.glsl", GL_VERTEX_SHADER);
-	//fragShader = loadShader("shaders\\fragment.glsl", GL_FRAGMENT_SHADER);
-	//shaderPro = linkToProgram(vertexShader, fragShader);
+	std::cout << cam.m_position[0] << " " << cam.m_position[1] << " " << cam.m_position[2] << std::endl;
 
-	//glViewport(0, 0, m_window_width, m_window_height);
-	//
-	//glMatrixMode(GL_PROJECTION);
-	//glLoadIdentity();
-	////glFrustum(-30, 30, -30, 30, 50, -50);
-	//gluPerspective(60, ratio, 0.1, 500.0);
+	Eigen::Vector3f center = cam.m_position + cam.m_axis[Camera::FORWARD];
+	glm::vec3 Eye(cam.m_position[0], cam.m_position[1], cam.m_position[2]);
+	glm::vec3 Center(center[0], center[1], center[2]);
+	glm::vec3 Up(cam.m_axis[Camera::UP][0], cam.m_axis[Camera::UP][1], cam.m_axis[Camera::UP][2]);
+	glm::mat4x4 ViewMat = glm::lookAt(Eye, Center, Up);
+	
+	Shader.SetMatrix4x4("_ViewMatrix", &ViewMat[0].x);
 
-	////glOrtho(-30, 30, -30.f, 30.f, -50.f, 50.f);
-	////glOrtho(xStart, xEnd, yStart, yEnd, zStart, zEnd);
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity();
+	glm::mat4x4 ProjectionMat = glm::perspective(glm::radians(45.0f), Ratio, 0.1f, 100.0f);
+	Shader.SetMatrix4x4("_ProjectionMatrix", &ProjectionMat[0].x);
 
-	//std::cout << cam.m_position[0] << " " << cam.m_position[1] << " " << cam.m_position[2] << std::endl;
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	//Eigen::Vector3f center = cam.m_position + cam.m_axis[Camera::FORWARD];
-
-	//gluLookAt(cam.m_position[0], cam.m_position[1], cam.m_position[2], center[0], center[1], center[2], cam.m_axis[Camera::UP][0], cam.m_axis[Camera::UP][1], cam.m_axis[Camera::UP][2]);
 
 	////add the uniform info to shader
 	//glUseProgram(shaderPro);
