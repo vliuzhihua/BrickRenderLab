@@ -11,7 +11,7 @@
 #include "fstream"
 #include "string"
 
-#include "CImg/CImg.h"
+//#include "CImg/CImg.h"
 #include "FreeImage.h"
 
 Renderer renderer;

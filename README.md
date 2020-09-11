@@ -3,7 +3,7 @@ Personal Graphics Engine
 
 ## Install
 1. git clone the repo
-2. cmake(platform choose x32)
+2. cmake(visual studio version need greater than vs2017, platform choose x32)
 3. open with visual studio
 4. set working directory to "project_space"
 5. set client as launch project

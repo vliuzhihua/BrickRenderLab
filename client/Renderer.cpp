@@ -64,14 +64,23 @@ void Renderer::PrepareRender()
 
 
 	FIBITMAP* Img = FreeImage_Load(FREE_IMAGE_FORMAT::FIF_JPEG, "res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.jpg");
+	//FIBITMAP* Img = FreeImage_Load(FREE_IMAGE_FORMAT::FIF_PNG, "res\\models\\brick_rough_ue4ifa0va\\preview.png");
 	auto ImgWidth = FreeImage_GetWidth(Img);
 	auto ImgHeight = FreeImage_GetHeight(Img);
 	BYTE* data = FreeImage_GetBits(Img);
 	
 	glGenTextures(1, &Tex1);
-	glActiveTexture(1);
+	//glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, Tex1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ImgWidth, ImgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (unsigned char*)data);
+	// 为当前绑定的纹理对象设置环绕、过滤方式,不可遗漏否则采样不出来。
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ImgWidth, ImgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (unsigned char*)data);
+
+	FreeImage_Unload(Img);
 
 	float vertices[] = {
 		-0.5f, -0.5f, 0.0f,
@@ -125,6 +134,12 @@ void Renderer::Render(const Camera& cam)
 
 	glm::mat4x4 ProjectionMat = glm::perspective(glm::radians(45.0f), Ratio, 0.1f, 100.0f);
 	Shader.SetMatrix4x4("_ProjectionMatrix", &ProjectionMat[0].x);
+
+	//glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(1);
+	glBindTexture(GL_TEXTURE_2D, Tex1);
+
+	Shader.SetInt("Tex", 0);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
