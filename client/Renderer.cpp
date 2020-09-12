@@ -28,26 +28,37 @@ void Renderer::OnWindowSizeChange(uint16_t width, uint16_t height)
 void Renderer::PrepareRender()
 {
 	std::string warn, err;
-	std::string file_name = "res/models/brick_rough_ue4ifa0va/ue4ifa0va__LOD0.obj";
-	std::string dir_name = "res/models/brick_rough_ue4ifa0va";
+	//std::string file_name = "res/models/brick_rough_ue4ifa0va/ue4ifa0va__LOD0.obj";
+	//std::string dir_name = "res/models/brick_rough_ue4ifa0va";
+	std::string file_name = "res/models/edible_fruit_ujcxeblva/ujcxeblva_LOD0.obj";
+	std::string dir_name = "res/models/edible_fruit_ujcxeblva";
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
 
 	bool re = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name.c_str(), dir_name.c_str());
 
 	glGenBuffers(1, &vertexBO);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBO);
 	glBufferData(GL_ARRAY_BUFFER, attrib.vertices.size() * sizeof(GLfloat), attrib.vertices.data(), GL_STREAM_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glEnableVertexAttribArray(0);
 
-	glGenBuffers(1, &texcoordBO);
-	glBindBuffer(GL_ARRAY_BUFFER, texcoordBO);
-	glBufferData(GL_ARRAY_BUFFER, attrib.texcoords.size() * sizeof(GLfloat), attrib.texcoords.data(), GL_STREAM_DRAW);
+	//glGenBuffers(1, &texcoordBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, texcoordBO);
+	//glBufferData(GL_ARRAY_BUFFER, attrib.texcoords.size() * sizeof(GLfloat), attrib.texcoords.data(), GL_STREAM_DRAW);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+	//glEnableVertexAttribArray(1);
 
-	glGenBuffers(1, &normalBO);
-	glBindBuffer(GL_ARRAY_BUFFER, normalBO);
-	glBufferData(GL_ARRAY_BUFFER, attrib.normals.size() * sizeof(GLfloat), attrib.normals.data(), GL_STREAM_DRAW);
+	//glGenBuffers(1, &normalBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, normalBO);
+	//glBufferData(GL_ARRAY_BUFFER, attrib.normals.size() * sizeof(GLfloat), attrib.normals.data(), GL_STREAM_DRAW);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+	//glEnableVertexAttribArray(1);
 
-	glGenBuffers(1, &ColorBO);
-	glBindBuffer(GL_ARRAY_BUFFER, ColorBO);
-	glBufferData(GL_ARRAY_BUFFER, attrib.colors.size() * sizeof(GLfloat), attrib.colors.data(), GL_STREAM_DRAW);
+	//glGenBuffers(1, &ColorBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, ColorBO);
+	//glBufferData(GL_ARRAY_BUFFER, attrib.colors.size() * sizeof(GLfloat), attrib.colors.data(), GL_STREAM_DRAW);
 
 	unsigned int* index = new unsigned int[shapes[0].mesh.indices.size()];
 	for (int i = 0; i < shapes[0].mesh.indices.size(); i++)
@@ -82,20 +93,6 @@ void Renderer::PrepareRender()
 
 	FreeImage_Unload(Img);
 
-	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
-	};
-	
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);
 }
@@ -141,8 +138,7 @@ void Renderer::Render(const Camera& cam)
 
 	Shader.SetInt("Tex", 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-
+	glDrawElements(GL_TRIANGLES, shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
 
 	////add the uniform info to shader
 	//glUseProgram(shaderPro);
