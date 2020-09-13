@@ -4,31 +4,77 @@
 #include <sstream>
 #include <iostream>
 
-FShader::FShader(const char* VertexPath, const char* FragmentPath)
+FShader* FShaderManager::CreateShader(const char* iVertexPath, const char* iFragmentPath) {
+    FShader* Shader = new FShader(iVertexPath, iFragmentPath);
+    mShaderVector.push_back(Shader);
+    return Shader;
+}
+
+void FShaderManager::DeleteShader(FShader* iShader) {
+    for (decltype(mShaderVector)::iterator Iter = mShaderVector.begin(); Iter != mShaderVector.end(); Iter++) {
+        if (*Iter == iShader) {
+            mShaderVector.erase(Iter);
+            return;
+        }
+    }
+}
+void FShaderManager::InitDefaultShader(const char* iVecterPath, const char* iFragmentPath) {
+    mDefaultShader = new FShader(iVecterPath, iFragmentPath);
+}
+void FShaderManager::UseDefaultShader() {
+    if (mDefaultShader)
+        mDefaultShader->Use();
+}
+
+FShader* FShaderManager::GetDefaultShader() {
+    return mDefaultShader;
+}
+
+void FShaderManager::Update() {
+    if (mNeedRecompiledAll) {
+        std::cout << "All Shader Recompile" << std::endl;
+        for (auto Shader : mShaderVector) {
+            Shader->Recompile();
+        }
+        mNeedRecompiledAll = false;
+    }
+}
+
+void FShaderManager::SetNeedRecompileAll(bool iState) {
+    mNeedRecompiledAll = iState;
+}
+
+FShader::FShader(const char* iVertexPath, const char* iFragmentPath)
 {
+    Init(iVertexPath, iFragmentPath);
+}
+
+void FShader::Init(const char* iVertexPath, const char* iFragmentPath) {
+    mVertexPath = iVertexPath;
+    mFragmentPath = iFragmentPath;
     GLuint VertexShader, FragShader;
 
-    if (!CreateShader(GL_VERTEX_SHADER, VertexPath, VertexShader)) {
-        std::cout << "Shader Create Failed " << VertexPath << " :::: " << FragmentPath << std::endl;
+    if (!CreateShader(GL_VERTEX_SHADER, iVertexPath, VertexShader)) {
+        std::cout << "Shader Create Failed " << iVertexPath << " :::: " << iFragmentPath << std::endl;
         return;
     }
 
-    if (!CreateShader(GL_FRAGMENT_SHADER, FragmentPath, FragShader)) {
-        std::cout << "Shader Create Failed " << VertexPath << " :::: " << FragmentPath << std::endl;
+    if (!CreateShader(GL_FRAGMENT_SHADER, iFragmentPath, FragShader)) {
+        std::cout << "Shader Create Failed " << iVertexPath << " :::: " << iFragmentPath << std::endl;
         DeleteShader(VertexShader);
         return;
     }
     GLint Success;
-    ID = glCreateProgram();
-    glAttachShader(ID, VertexShader);
-    glAttachShader(ID, FragShader);
-    glLinkProgram(ID);
+    mID = glCreateProgram();
+    glAttachShader(mID, VertexShader);
+    glAttachShader(mID, FragShader);
+    glLinkProgram(mID);
 
-    glGetProgramiv(ID, GL_LINK_STATUS, &Success);
+    glGetProgramiv(mID, GL_LINK_STATUS, &Success);
     if (!Success)
     {
         char InfoLog[512];
-        glGetProgramInfoLog(ID, 512, NULL, InfoLog);
+        glGetProgramInfoLog(mID, 512, NULL, InfoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << InfoLog << std::endl;
     }
 
@@ -38,29 +84,47 @@ FShader::FShader(const char* VertexPath, const char* FragmentPath)
 }
 
 FShader::~FShader() {
-    if (ID != -1)
-        glDeleteProgram(ID);
+    Release();
 }
 
-void FShader::Use()
+void FShader::Release() {
+    if (mID != 0) {
+        glDeleteProgram(mID);
+        mID = 0;
+    }
+}
+
+FShader* FShader::Use()
 {
-    glUseProgram(ID);
+    if (IsInited()) {
+        glUseProgram(mID);
+        return this;
+    }
+    else {
+        FShaderManager::Instance().UseDefaultShader();
+        return FShaderManager::Instance().GetDefaultShader();
+    }
+}
+
+void FShader::Recompile() {
+    Release();
+    Init(mVertexPath.c_str(), mFragmentPath.c_str());
 }
 
 void FShader::SetBool(const std::string& Name, bool Value) const
 {
-    glUniform1i(glGetUniformLocation(ID, Name.c_str()), (int)Value);
+    glUniform1i(glGetUniformLocation(mID, Name.c_str()), (int)Value);
 }
 void FShader::SetInt(const std::string& Name, int Value) const
 {
-    glUniform1i(glGetUniformLocation(ID, Name.c_str()), Value);
+    glUniform1i(glGetUniformLocation(mID, Name.c_str()), Value);
 }
 void FShader::SetFloat(const std::string& Name, float Value) const
 {
-    glUniform1f(glGetUniformLocation(ID, Name.c_str()), Value);
+    glUniform1f(glGetUniformLocation(mID, Name.c_str()), Value);
 }
 void FShader::SetMatrix4x4(const std::string& Name, float* Value) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, Name.c_str()), 1, false, Value);
+    glUniformMatrix4fv(glGetUniformLocation(mID, Name.c_str()), 1, false, Value);
 }
 
 bool FShader::CreateShader(GLuint ShaderType, const char* Path, GLuint& ShaderId) {

@@ -1,6 +1,8 @@
+#include <Windows.h>
+
 #include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
+//#include <stdlib.h>
+//#include <stdio.h>
 //#include <GL/gl.h>
 //#include <GL/glu.h>
 #include "glad/glad.h"
@@ -13,6 +15,10 @@
 
 //#include "CImg/CImg.h"
 #include "FreeImage.h"
+#include <fileapi.h>
+//#include <WinBase.h>
+//#include <cstringt.h>
+#include "Shader.h"
 
 Renderer renderer;
 Camera camera;
@@ -101,6 +107,115 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 }
 
+std::string wchar2char(const wchar_t* wchar)
+{
+	char m_char[512];
+	int len = WideCharToMultiByte(CP_ACP, 0, wchar, wcslen(wchar), NULL, 0, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, wchar, wcslen(wchar), m_char, len, NULL, NULL);
+	m_char[len] = '\0';
+	return m_char;
+}
+
+//LPCWSTR WatchDirStr = L"D:\\1_BrickGE\\project_space";
+LPCWSTR WatchDirStr = L".\\";
+HANDLE DirectoryHandler;
+
+void ProcessDirectoryWatch() {
+	char notify[1024];
+	memset(notify, 0, sizeof(notify));
+	FILE_NOTIFY_INFORMATION* pNotification = (FILE_NOTIFY_INFORMATION*)notify;
+	DWORD BytesReturned = 0;
+
+	if (DirectoryHandler == INVALID_HANDLE_VALUE)
+		return;
+
+	while (TRUE)
+	{
+		ZeroMemory(pNotification, sizeof(notify));
+
+		bool watch_state = ReadDirectoryChangesW(DirectoryHandler,
+			&notify,
+			sizeof(notify),
+			TRUE,	//监控子目录
+			FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE, //FILE_NOTIFY_CHANGE_DIR_NAME FILE_NOTIFY_CHANGE_CREATION FILE_NOTIFY_CHANGE_SIZE
+			(LPDWORD)&BytesReturned,
+			NULL,
+			NULL);
+
+		if (GetLastError() == ERROR_INVALID_FUNCTION)
+		{
+			std::cout << "文件监控，系统不支持!" << std::endl;
+			break;
+		}
+		else if (watch_state == FALSE)
+		{
+			DWORD dwErr = GetLastError();
+			std::cout << "文件监控，监控失败!" << std::endl;;
+			break;
+		}
+		else if (GetLastError() == ERROR_NOTIFY_ENUM_DIR)
+		{
+			std::cout << "文件监控，内存溢出" << std::endl;
+			continue;
+		}
+		else
+		{
+			//这里主要就是检测返回的信息，(FILE_NOTIFY_INFORMATION)
+			//CString szFileName(pNotification->FileName, pNotification->FileNameLength / sizeof(wchar_t));
+			if (pNotification->Action == FILE_ACTION_ADDED)
+			{
+				std::cout << "文件监控，新增文件!" << wchar2char(pNotification->FileName) << std::endl;
+			}
+			else if (pNotification->Action == FILE_ACTION_REMOVED)
+			{
+				std::cout << "文件监控，删除文件!" << wchar2char(pNotification->FileName) << std::endl;
+			}
+			else if (pNotification->Action == FILE_ACTION_MODIFIED)
+			{
+				std::cout << "文件监控，修改文件!" << wchar2char(pNotification->FileName) << std::endl;
+			}
+			else if (pNotification->Action == FILE_ACTION_RENAMED_OLD_NAME)
+			{
+				std::cout << "文件监控，重命名文件!" << wchar2char(pNotification->FileName) << std::endl;
+			}
+			else if (pNotification->Action == FILE_ACTION_RENAMED_NEW_NAME) //还没出现过这种情况
+			{
+				std::cout << "文件监控，重命名文件2!" << wchar2char(pNotification->FileName) << std::endl;
+			}
+
+			FShaderManager::Instance().SetNeedRecompileAll(true);
+			//PostMessage通知主线程
+		}
+	}
+}
+
+DWORD WINAPI WatchThreadFunc(LPVOID p)
+{
+	ProcessDirectoryWatch();
+	//printf("我是子线程， pid = %d\n", GetCurrentThreadId());   //输出子线程pid
+	return 0;
+}
+
+void InitDirectoryWatch() {
+	DirectoryHandler = CreateFile(WatchDirStr,
+		GENERIC_READ | GENERIC_WRITE | FILE_LIST_DIRECTORY,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL,
+		OPEN_EXISTING,
+		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+		NULL);
+	if (DirectoryHandler == INVALID_HANDLE_VALUE)
+	{
+		DWORD dwErr = GetLastError();
+		std::cout << "Watcher Init Error" << std::endl;
+		return;
+	}
+	HANDLE hThread;
+	DWORD  threadId;
+	hThread = CreateThread(NULL, 0, WatchThreadFunc, 0, 0, &threadId); // 创建线程
+}
+
+
 int main()
 {
 	const int w = 1366;
@@ -141,7 +256,8 @@ int main()
 	//Img.load_jpeg("D:\\1_BrickGE\\project_space\\res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.jpg");
 	//Img.display();
 
-
+	InitDirectoryWatch();
+	FShaderManager::Instance().InitDefaultShader("shaders\\\default\\default.vs", "shaders\\default\\default.ps");
 
 	renderer.PrepareRender();
 	
@@ -150,7 +266,8 @@ int main()
 		float ratio;
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
-
+		
+		FShaderManager::Instance().Update();
 		processInput(window);
 
 		renderer.OnWindowSizeChange(width, height);
