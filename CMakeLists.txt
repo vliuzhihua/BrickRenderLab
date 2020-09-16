@@ -16,21 +16,4 @@ add_subdirectory("3rdpartylib/glad")
 add_subdirectory("3rdpartylib/tinyobjloader/tinyobjloader")
 add_subdirectory("client")
 
-# create_target_group(3rdparty)
 
-#about d3d
-# set(DXSDK_DIR "$ENV{DXSDK_DIR}")
-# set(DXSDK_INCLUDE_DIR "${DXSDK_DIR}/Include")
-# include_directories("${DXSDK_INCLUDE_DIR}")
-# if ("${CMAKE_GENERATOR}" MATCHES "Win64")
-#     set(DXSDK_LIB_DIR "${DXSDK_DIR}/Lib/x64")
-#     link_directories("${DXSDK_LIB_DIR}")
-# else()
-#     set(DXSDK_LIB_DIR "${DXSDK_DIR}/Lib/x86")
-#     link_directories("${DXSDK_DIR}/Lib/x86")
-# endif()
-# message(status "dx include path: " "${DXSDK_INCLUDE_DIR}")
-# message(status "dx lib path: " "${DXSDK_LIB_DIR}")
-
-# #link_directories和include_directories需要在add_executable之前!!!
-# ADD_EXECUTABLE(test_proj ${DIR_SRCS})

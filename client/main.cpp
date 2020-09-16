@@ -249,6 +249,10 @@ int main()
 	last_curx = w * 0.5;
 	last_cury = h * 0.5;
 
+	int nrAttributes;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	//cimg_library::CImg<unsigned char> Img;
 	//Img.load_bmp("res\\models\\brick_rough_ue4ifa0va\\ue4ifa0va_4K_Albedo.bmp");
