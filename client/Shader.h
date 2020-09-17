@@ -21,6 +21,7 @@ public:
     void SetBool(const std::string& Name, bool Value) const;
     void SetInt(const std::string& Name, int Value) const;
     void SetFloat(const std::string& Name, float Value) const;
+    void SetFloat4(const std::string& Name, float* Value) const;
     void SetMatrix4x4(const std::string& Name, float* Value) const;
    
 protected:

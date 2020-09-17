@@ -78,6 +78,9 @@ void Renderer::Render(const Camera& cam)
 	glm::mat4x4 ProjectionMat = glm::perspective(glm::radians(45.0f), Ratio, 0.1f, 100.0f);
 	RealShader->SetMatrix4x4("_ProjectionMatrix", &ProjectionMat[0].x);
 
+	float CameraPosition[4] = { Eye.x, Eye.y, Eye.z, 1.0 };
+	RealShader->SetFloat4("_CameraPosition", CameraPosition);
+
 	SetTexture(0, "AlbedoTex", AlbedoTex, RealShader);
 	SetTexture(1, "NormalTex", NormalTex, RealShader);
 	SetTexture(2, "RoughnessTex", RoughnessTex, RealShader);

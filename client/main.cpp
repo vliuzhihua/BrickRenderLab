@@ -32,7 +32,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	const float dis = 0.5;
+	const float dis = 0.2;
 	switch (key)
 	{
 	case GLFW_KEY_W:
@@ -74,9 +74,9 @@ bool can_ratate = false;
 static void cursor_callback(GLFWwindow* window, double x, double y)
 {
 	//std::cout << x << " " << y << std::endl;
-	const float scale = 0.01;
+	const float scale = 0.005;
 	if(can_ratate)
-		camera.Rotate({ (float)-(y - last_cury) * scale, -(float)(x - last_curx) * scale, 0 });
+		camera.Rotate({ -(float)(y - last_cury) * scale, -(float)(x - last_curx) * scale, 0 });
 	last_curx = x;
 	last_cury = y;
 }
@@ -116,7 +116,6 @@ std::string wchar2char(const wchar_t* wchar)
 	return m_char;
 }
 
-//LPCWSTR WatchDirStr = L"D:\\1_BrickGE\\project_space";
 LPCWSTR WatchDirStr = L".\\";
 HANDLE DirectoryHandler;
 
