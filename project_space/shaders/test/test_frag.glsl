@@ -5,17 +5,20 @@ in vec4 VO_PositionClipSpace;
 in vec4 VO_LocalNormal;
 in vec4 VO_Texcoord0;
 
-uniform sampler2D Tex;
+uniform sampler2D AlbedoTex;
+uniform sampler2D NormalTex;
+uniform sampler2D RoughnessTex;
+uniform sampler2D SpecularTex;
 
 void main()
 {		
 	vec2 ScreenUV = (VO_PositionClipSpace.xy / VO_PositionClipSpace.w) * 0.5 + 0.5;
-	FragColor = vec4(1.0);
-	FragColor = texture(Tex, ScreenUV);
-	FragColor = texture(Tex, VO_Texcoord0.xy);
-	// FragColor.xy = VO_Texcoord0.xy;
-	// FragColor.xyz = VO_LocalNormal.xyz;
-	//FragColor = vec4(ScreenUV.x, ScreenUV.y, 0, 0);
-	// FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+	float PerceptualRoughness = texture(RoughnessTex, VO_Texcoord0.xy).r;
+
+	FragColor = texture(AlbedoTex, VO_Texcoord0.xy);
+
+	// FragColor = vec4(PerceptualRoughness);
+
 }
 
