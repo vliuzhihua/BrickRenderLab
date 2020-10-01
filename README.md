@@ -1,5 +1,4 @@
-# BrickGE
-Personal Graphics Engine
+# Personal RenderLab
 
 ## Install
 1. git clone the repo
