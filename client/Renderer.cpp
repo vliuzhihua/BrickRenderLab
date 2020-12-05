@@ -58,7 +58,7 @@ void Renderer::PrepareRender()
 
 void Renderer::Render(const Camera& cam)
 {
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0.176, 0.2666, 0.3215, 0);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
