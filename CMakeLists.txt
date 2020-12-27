@@ -14,6 +14,8 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_subdirectory("3rdpartylib/glfw")
 add_subdirectory("3rdpartylib/glad")
 add_subdirectory("3rdpartylib/tinyobjloader/tinyobjloader")
+
+add_subdirectory("core/math")
 add_subdirectory("core/client")
 
 

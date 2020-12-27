@@ -20,6 +20,8 @@
 //#include <cstringt.h>
 #include "Shader.h"
 
+using namespace brick;
+
 Renderer renderer;
 Camera camera;
 
@@ -32,12 +34,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	const float dis = 0.2;
+	const float dis = 0.2f;
 	switch (key)
 	{
 	case GLFW_KEY_W:
 		{
 		camera.Move<Camera::FORWARD>(dis);
+		break;
+		}
+	case GLFW_KEY_S:
+		{
+		camera.Move<Camera::FORWARD>(-dis);
 		break;
 		}
 	case GLFW_KEY_D:
@@ -50,19 +57,14 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		camera.Move<Camera::RIGHT>(-dis);
 		break;
 		}
-	case GLFW_KEY_S:
-		{
-		camera.Move<Camera::FORWARD>(-dis);
-		break;
-		}
 	case GLFW_KEY_Q:
 		{
-		camera.Move<Camera::UP>(-dis);
+		camera.Move<Camera::UP>(dis);
 		break;
 		}
 	case GLFW_KEY_E:
 		{
-		camera.Move<Camera::UP>(dis);
+		camera.Move<Camera::UP>(-dis);
 		break;
 		}
 	}
@@ -76,7 +78,10 @@ static void cursor_callback(GLFWwindow* window, double x, double y)
 	//std::cout << x << " " << y << std::endl;
 	const float scale = 0.005;
 	if(can_ratate)
-		camera.Rotate({ -(float)(y - last_cury) * scale, -(float)(x - last_curx) * scale, 0 });
+		if(abs(y - last_cury) > abs(x - last_curx))
+			camera.Rotate({ -(float)(y - last_cury) * scale, 0.f, 0.0f });
+		else
+			camera.Rotate({ 0.f, (float)(x - last_curx) * scale, 0 });
 	last_curx = x;
 	last_cury = y;
 }
@@ -260,13 +265,14 @@ int main()
 	//Img.display();
 
 	InitDirectoryWatch();
-	FShaderManager::Instance().InitDefaultShader("shaders\\\default\\default.vs", "shaders\\default\\default.ps");
+	FShaderManager::Instance().InitDefaultShader("shaders\\default\\default.vs", "shaders\\default\\default.ps");
 
 	renderer.PrepareRender();
+
+	camera.SetPosition({ 0.0f, 0.0f, -1.0f });
 	
 	while (!glfwWindowShouldClose(window))
 	{
-		float ratio;
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
 		
@@ -284,4 +290,7 @@ int main()
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
+
+
+
 }

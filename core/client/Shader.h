@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>;
+#include <glad/glad.h>
 
 #include <string>
 #include <map>
@@ -18,11 +18,11 @@ public:
     FShader* Use();
     void Recompile();
     // uniform utility function
-    void SetBool(const std::string& Name, bool Value) const;
-    void SetInt(const std::string& Name, int Value) const;
-    void SetFloat(const std::string& Name, float Value) const;
-    void SetFloat4(const std::string& Name, float* Value) const;
-    void SetMatrix4x4(const std::string& Name, float* Value) const;
+    void SetBool(const std::string& Name, const bool Value) const;
+    void SetInt(const std::string& Name, const int Value) const;
+    void SetFloat(const std::string& Name, const float Value) const;
+    void SetFloat4(const std::string& Name, const float* Value) const;
+    void SetMatrix4x4(const std::string& Name, const float* Value) const;
    
 protected:
     // bulid shader, ony called by FShaderManager

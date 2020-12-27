@@ -1,9 +1,7 @@
 #pragma once
-#include "Eigen/StdVector"
-//#include "Eigen/Eigen"
-#include "Eigen/Dense"
-#include "Math.h"
-#include "glm/gtc/matrix_transform.hpp"
+#include "math/GraphicsMath.h"
+
+namespace brick {
 
 class Camera
 {
@@ -17,59 +15,71 @@ public:
 
 	Camera()
 	{
-		m_position = { 0, 0, 0};
-		m_axis[RIGHT] = { 1, 0, 0};
-		m_axis[UP] = { 0, 1, 0 };
-		m_axis[FORWARD] = { 0, 0, -1};
+		m_transform = math::Matrix4x4f::Identity();
 	}
 
 	template<Direction dir>
-	void Move(float distance = 0.1)
+	void Move(float distance = 0.5)
 	{
-		m_position += m_axis[dir] * distance;
+		SetPosition(GetPosition() +  GetDirVector<dir>() * distance);
+		//SetPosition(GetPosition() +  GetDirVector<dir>());
+		//SetPosition(GetPosition() + 1.0f);
 	}
 
-	void Rotate(Eigen::Vector3f euler_degree)
+	void Rotate(math::Vector3f euler_degree)
 	{
-		auto rotate_func = [&](float degree, Eigen::Vector3f axis)
-		{
-			Eigen::AngleAxisf rotate(degree, axis);
 
-			m_axis[RIGHT] = rotate.toRotationMatrix() * m_axis[RIGHT];
-			m_axis[UP] = rotate.toRotationMatrix() *  m_axis[UP];
-			m_axis[FORWARD] = rotate.toRotationMatrix() *  m_axis[FORWARD];
-		};
-
-		glm::mat4 Trans = glm::mat4(1.0f);
-		glm::rotate(Trans, euler_degree[0], glm::vec3(1.0, 0.0, 0.0));
-		glm::rotate(Trans, euler_degree[1], glm::vec3(0.0, 1.0, 0.0));
-		glm::rotate(Trans, euler_degree[2], glm::vec3(0.0, 0.0, 1.0));
-
-		glm::mat4 OriginMat = { 
-			m_axis[RIGHT][0], m_axis[RIGHT][1], m_axis[RIGHT][2], 0.0,
-			m_axis[UP][0], m_axis[UP][1], m_axis[UP][2], 0.0,
-			m_axis[FORWARD][0], m_axis[FORWARD][1], m_axis[FORWARD][2], 0.0,
-			0.0, 0.0, 0.0, 1.0
-		};
-
-		glm::mat4 NewMat = Trans * OriginMat;// *Trans;
-
-		//m_axis[RIGHT] = { NewMat[0][0], NewMat[0][1], NewMat[0][2] };
-		//m_axis[UP] = { NewMat[1][0], NewMat[1][1], NewMat[1][2] };
-		//m_axis[FORWARD] = { NewMat[2][0], NewMat[2][1], NewMat[2][2] };
-
-		rotate_func(euler_degree[0], m_axis[RIGHT]);
-		rotate_func(euler_degree[1], m_axis[UP]);
-		rotate_func(euler_degree[2], m_axis[FORWARD]);
-		
-		//m_axis[UP] = Eigen::Cross(m_axis[RIGHT], m_axis[FORWARD]);
-		//m_axis[UP] = m_axis[RIGHT].cross(m_axis[FORWARD]);
-
+		auto Position = GetPosition();
+		//m_transform = math::RotateAroundZ(euler_degree.z) * math::RotateAroundY(euler_degree.y) * math::RotateAroundX(euler_degree.x) * GetRotation();
+		m_transform = math::RotateAroundY(euler_degree.y) * math::RotateAroundX(euler_degree.x) * GetRotation();
+		//m_transform = math::RotateAroundX(euler_degree.x) * GetRotation();
+		SetPosition(Position);
 	}
 
-//private:
-	Eigen::Matrix4f m_transform;
-	Eigen::Vector3f m_position;
-	//0: Right; 1: Up; 2: Forward
-	Eigen::Vector3f m_axis[3];
+	template<Direction dir>
+	math::Vector3f GetDirVector() {
+		if constexpr (dir == FORWARD) {
+			return GetForward();
+		}else if constexpr(dir == RIGHT) {
+			return GetRight();
+			}
+		else {
+			return GetUp();
+		}
+	}
+
+	math::Vector3f GetForward() const {
+		return { m_transform(0, 2), m_transform(1, 2), m_transform(2, 2) };
+	}
+
+	math::Vector3f GetRight() const {
+		return { m_transform(0, 0), m_transform(1, 0), m_transform(2, 0) };
+	}
+
+	math::Vector3f GetUp() const {
+		return { m_transform(0, 1), m_transform(1, 1), m_transform(2, 1) };
+	}
+
+	math::Vector3f GetPosition() const {
+		return {m_transform(0, 3), m_transform(1, 3), m_transform(2, 3)};
+	}
+
+	void SetPosition(const math::Vector3f& Position) {
+		m_transform(0, 3) = Position.x;
+		m_transform(1, 3) = Position.y;
+		m_transform(2, 3) = Position.z;
+	}
+
+	math::Matrix4x4f GetRotation() const {
+		math::Matrix4x4f RotationMat(m_transform.GetData());
+		RotationMat(0, 3) = 0.0f;
+		RotationMat(1, 3) = 0.0f;
+		RotationMat(2, 3) = 0.0f;
+		return RotationMat;
+	}
+
+private:
+	math::Matrix4x4f m_transform;
 };
+
+}

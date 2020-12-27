@@ -8,7 +8,8 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 include_directories("${ROOT_DIR}/3rdpartylib")
 include_directories("${ROOT_DIR}/3rdpartylib/FreeImage/Dist/x32")
 include_directories("${ROOT_DIR}/3rdpartylib/glad/include")
-include_directories("${ROOT_DIR}/3rdpartylib/glm")
+#include_directories("${ROOT_DIR}/3rdpartylib/glm")
+include_directories("${ROOT_DIR}/core")
 link_directories(${ROOT_DIR}/3rdpartylib/GL/lib)
 link_directories(${ROOT_DIR}/3rdpartylib/FreeImage/Dist/x32)
 
@@ -38,3 +39,5 @@ target_link_libraries(client glad)
 
 #target_link_libraries(client glew32)
 #target_link_libraries(client glut32
+
+target_link_libraries(client math)

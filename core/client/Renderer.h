@@ -2,6 +2,8 @@
 #include "Camera.h"
 #include<stdint.h>
 
+namespace brick {
+
 class Renderer
 {
 public:
@@ -14,3 +16,4 @@ private:
 	
 
 };
+}

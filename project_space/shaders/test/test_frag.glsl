@@ -119,7 +119,7 @@ vec3 GammaToLinear(vec3 x)
 void main()
 {	
 	float SunLightIrradiance = 1.0;
-	vec3 SunLightDirection = normalize(vec3(0.5, 0.5, 0.5));
+	vec3 SunLightDirection = normalize(vec3(0.5, 0.5, -0.5));
 	float PerceptualRoughness = texture(RoughnessTex, VO_Texcoord0.xy).r;
 	float LinearRoughness = sqr(PerceptualRoughness);
 	vec3 AlbedoColor = texture(AlbedoTex, VO_Texcoord0.xy).rgb;

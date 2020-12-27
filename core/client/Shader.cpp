@@ -111,27 +111,27 @@ void FShader::Recompile() {
     Init(mVertexPath.c_str(), mFragmentPath.c_str());
 }
 
-void FShader::SetBool(const std::string& Name, bool Value) const
+void FShader::SetBool(const std::string& Name, const bool Value) const
 {
     glUniform1i(glGetUniformLocation(mID, Name.c_str()), (int)Value);
 }
 
-void FShader::SetInt(const std::string& Name, int Value) const
+void FShader::SetInt(const std::string& Name, const int Value) const
 {
     glUniform1i(glGetUniformLocation(mID, Name.c_str()), Value);
 }
 
-void FShader::SetFloat(const std::string& Name, float Value) const
+void FShader::SetFloat(const std::string& Name, const float Value) const
 {
     glUniform1f(glGetUniformLocation(mID, Name.c_str()), Value);
 }
 
-void FShader::SetFloat4(const std::string& Name, float* Value) const {
+void FShader::SetFloat4(const std::string& Name, const float* Value) const {
     glUniform4f(glGetUniformLocation(mID, Name.c_str()), Value[0], Value[1], Value[2], Value[3]);
 }
 
-void FShader::SetMatrix4x4(const std::string& Name, float* Value) const {
-    glUniformMatrix4fv(glGetUniformLocation(mID, Name.c_str()), 1, false, Value);
+void FShader::SetMatrix4x4(const std::string& Name, const float* Value) const {
+    glUniformMatrix4fv(glGetUniformLocation(mID, Name.c_str()), 1, true, Value);
 }
 
 bool FShader::CreateShader(GLuint ShaderType, const char* Path, GLuint& ShaderId) {

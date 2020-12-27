@@ -4,13 +4,12 @@
 #include "GLFW/glfw3.h"
 #include "loadShader.h"
 #include "FreeImage.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "Shader.h"
 #include "Model.h"
 #include "RenderNode.h"
 #include "Mesh.h"
 #include "Texture.h"
+#include "math/GraphicsMath.h"
 
 FModel* Model = nullptr;
 Texture* AlbedoTex = nullptr;
@@ -18,6 +17,8 @@ Texture* NormalTex = nullptr;
 Texture* AoTex = nullptr;
 Texture* RoughnessTex = nullptr;
 Texture* SpecularTex = nullptr;
+
+namespace brick {
 
 void Renderer::OnWindowSizeChange(uint16_t width, uint16_t height)
 {
@@ -67,19 +68,20 @@ void Renderer::Render(const Camera& cam)
 
 	float Ratio = m_window_width / (float)m_window_height;
 
-	Eigen::Vector3f center = cam.m_position + cam.m_axis[Camera::FORWARD];
-	glm::vec3 Eye(cam.m_position[0], cam.m_position[1], cam.m_position[2]);
-	glm::vec3 Center(center[0], center[1], center[2]);
-	glm::vec3 Up(cam.m_axis[Camera::UP][0], cam.m_axis[Camera::UP][1], cam.m_axis[Camera::UP][2]);
-	glm::mat4x4 ViewMat = glm::lookAt(Eye, Center, Up);
+	math::Vector3f Forward = cam.GetForward();
+	math::Vector3f Eye = cam.GetPosition();
+	math::Vector3f Up = cam.GetUp();
+	math::Matrix4x4f ViewMat = math::LookAt(Eye, Forward, Up);
 
-	RealShader->SetMatrix4x4("_ViewMatrix", &ViewMat[0].x);
+	//std::cout << ViewMat.GetString() << std::endl;
 
-	glm::mat4x4 ProjectionMat = glm::perspective(glm::radians(45.0f), Ratio, 0.1f, 100.0f);
-	RealShader->SetMatrix4x4("_ProjectionMatrix", &ProjectionMat[0].x);
+	RealShader->SetMatrix4x4("_ViewMatrix", ViewMat.GetData());
 
-	float CameraPosition[4] = { Eye.x, Eye.y, Eye.z, 1.0 };
-	RealShader->SetFloat4("_CameraPosition", CameraPosition);
+	math::Matrix4x4f ProjectionMat = math::Perspective(math::DegreeToRadian(45.0f), Ratio, 0.1f, 1000.0f);
+	RealShader->SetMatrix4x4("_ProjectionMatrix", ProjectionMat.GetData());
+
+	float Campos[] = { Eye.x, Eye.y, Eye.z, 1.0f };
+	RealShader->SetFloat4("_CameraPosition", Campos);
 
 	SetTexture(0, "AlbedoTex", AlbedoTex, RealShader);
 	SetTexture(1, "NormalTex", NormalTex, RealShader);
@@ -88,5 +90,7 @@ void Renderer::Render(const Camera& cam)
 
 	ImmediateRenderModel(Model);
 	//glDrawElements(GL_TRIANGLES, shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);
+
+}
 
 }
