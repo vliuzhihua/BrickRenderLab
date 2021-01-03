@@ -77,11 +77,9 @@ static void cursor_callback(GLFWwindow* window, double x, double y)
 {
 	//std::cout << x << " " << y << std::endl;
 	const float scale = 0.005;
-	if(can_ratate)
-		if(abs(y - last_cury) > abs(x - last_curx))
-			camera.Rotate({ -(float)(y - last_cury) * scale, 0.f, 0.0f });
-		else
-			camera.Rotate({ 0.f, (float)(x - last_curx) * scale, 0 });
+	if (can_ratate) {
+		camera.SetEulerRadian(camera.GetEulerRadian() + math::Vector3f{ -(float)(y - last_cury) * scale, -(float)(x - last_curx) * scale, 0.f });
+	}
 	last_curx = x;
 	last_cury = y;
 }

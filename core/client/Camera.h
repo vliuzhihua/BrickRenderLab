@@ -26,14 +26,20 @@ public:
 		//SetPosition(GetPosition() + 1.0f);
 	}
 
-	void Rotate(math::Vector3f euler_degree)
-	{
+	void SetEulerRadian(math::Vector3f EulerRadian) {
+		mEulerRadian = EulerRadian;
+		UpdateTransform();
+	}
 
+	math::Vector3f GetEulerRadian() {
+		return mEulerRadian;
+	}
+
+	void UpdateTransform() {
 		auto Position = GetPosition();
-		//m_transform = math::RotateAroundZ(euler_degree.z) * math::RotateAroundY(euler_degree.y) * math::RotateAroundX(euler_degree.x) * GetRotation();
-		m_transform = math::RotateAroundY(euler_degree.y) * math::RotateAroundX(euler_degree.x) * GetRotation();
-		//m_transform = math::RotateAroundX(euler_degree.x) * GetRotation();
+		m_transform = math::EulerToMatrix(mEulerRadian);
 		SetPosition(Position);
+
 	}
 
 	template<Direction dir>
@@ -80,6 +86,7 @@ public:
 
 private:
 	math::Matrix4x4f m_transform;
+	math::Vector3f mEulerRadian = {0.f};
 };
 
 }

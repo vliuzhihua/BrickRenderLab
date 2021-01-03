@@ -108,6 +108,10 @@ namespace math{
 			x = y = z = 0.0f;
 		}
 
+		Vector(float s) {
+			x = y = z = s;
+		}
+
 		Vector(float x, float y, float z) {
 			this->x = x;
 			this->y = y;
@@ -156,6 +160,17 @@ namespace math{
 			for (int i = 0; i < 3; i++)
 				data[i] = vec[i] * scaler;
 			return data;
+		}
+
+		std::string GetString() {
+			std::string Result = "";
+			char Buf[64];
+			for (int i = 0; i < 3; i++) {
+				sprintf(Buf, "%f", m_data[i]);
+				Result += Buf;
+				Result += " ";
+			}
+			return Result;
 		}
 
 		const float* GetData() {

@@ -22,14 +22,9 @@ namespace math {
 	}
 
 	inline Matrix4x4f LookAt(const Vector3f& Eye, const Vector3f& Forward, const Vector3f& Up) {
-		auto Right = Forward.Cross(Up);
-		auto OrthoUp = Right.Cross(Forward);
-		//Matrix4x4f Rotation = {
-		//	Right.x, OrthoUp.x, Forward.x, 0.f,
-		//	Right.y, OrthoUp.y, Forward.y, 0.f,
-		//	Right.z, OrthoUp.z, Forward.z, 0.f,
-		//	0.0f, 0.0f, 0.0f, 1.0f
-		//};
+		//cross product need right hand, so reverse the crose value
+		auto Right = Up.Cross(Forward);
+		auto OrthoUp = Forward.Cross(Right);
 		Matrix4x4f Rotation = {
 			Right.x,	Right.y,	Right.z,	0.f,
 			OrthoUp.x,	OrthoUp.y,	OrthoUp.z,	0.f,
@@ -100,6 +95,10 @@ namespace math {
 			0.0f,	0.0f,	1.0f,	0.0f
 		};
 		return data;
+	}
+
+	inline Matrix4x4f EulerToMatrix(Vector3f EulerRadian) {
+		return math::RotateAroundX(EulerRadian.x) *math::RotateAroundY(EulerRadian.y);
 	}
 }
 

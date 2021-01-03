@@ -74,6 +74,8 @@ void Renderer::Render(const Camera& cam)
 	math::Matrix4x4f ViewMat = math::LookAt(Eye, Forward, Up);
 
 	//std::cout << ViewMat.GetString() << std::endl;
+	//std::cout << "Right: " << cam.GetRight().GetString() << std::endl;
+	//std::cout << "Position: " << cam.GetPosition().GetString() << std::endl;
 
 	RealShader->SetMatrix4x4("_ViewMatrix", ViewMat.GetData());
 
