@@ -89,15 +89,38 @@ namespace math {
 		float A = (Far * NdcFar - Near * NdcNear) / Diff;
 		float B = (Near * Far * NdcNear - Near * Far * NdcFar) / Diff;
 		float data[] = {
-			Near/HalfNearWidth,	0.0f,	0.0f,	0.0f,
-			0.0f,	Near/HalfNearHeight,	0.0f,	0.0f,
-			0.0f,	0.0f,	A,		B,
-			0.0f,	0.0f,	1.0f,	0.0f
+			Near/HalfNearWidth,	0.0f,					0.0f,	0.0f,
+			0.0f,				Near/HalfNearHeight,	0.0f,	0.0f,
+			0.0f,				0.0f,					A,		B,
+			0.0f,				0.0f,					1.0f,	0.0f
 		};
 		return data;
 	}
+	
+	template<typename T>
+	inline Matrix4x4<T> EulerToMatrix(Vector3f EulerRadian) {
+		float x_angle = EulerRadian.x;
+		float y_angle = EulerRadian.y;
+		float z_angle = EulerRadian.z;
+		T xc = (T)cos(x_angle), xs = (T)sin(x_angle);
+		T yc = (T)cos(y_angle), ys = (T)sin(y_angle);
+		T zc = (T)cos(z_angle), zs = (T)sin(z_angle);
+		Matrix4x4<T> Mat = Matrix4x4<T>::Identity();
+		//case EULER_ORDER_XYZ:
+		{
+			Mat(0, 0) = yc * zc;
+			Mat(1, 0) = -xc * zs + zc * xs * ys;
+			Mat(2, 0) = xs * zs + xc * zc * ys;
 
-	inline Matrix4x4f EulerToMatrix(Vector3f EulerRadian) {
+			Mat(0, 1) = yc * zs;
+			Mat(1, 1) = xc * zc + xs * ys * zs;
+			Mat(2, 1) = -xs * zc + xc * ys * zs;
+
+			Mat(0, 2) = -ys;
+			Mat(1, 2) = xs * yc;
+			Mat(2, 2) = xc * yc;
+		}
+		return Mat;
 		return math::RotateAroundX(EulerRadian.x) *math::RotateAroundY(EulerRadian.y);
 	}
 }

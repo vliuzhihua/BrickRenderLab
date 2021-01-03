@@ -166,7 +166,7 @@ namespace math{
 			std::string Result = "";
 			char Buf[64];
 			for (int i = 0; i < 3; i++) {
-				sprintf(Buf, "%f", m_data[i]);
+				sprintf_s(Buf, "%f", m_data[i]);
 				Result += Buf;
 				Result += " ";
 			}
@@ -208,9 +208,9 @@ namespace math{
 				m_data[i] = *iter;
 		}
 
-		//T& operator[](int n) {
-		//	return m_data[n * M + c];
-		//}
+		T* operator[](int n) {
+			return (T*)&m_data[n * M];
+		}
 
 		T& operator() (int n, int c) {
 			return m_data[n * M + c];
@@ -230,6 +230,21 @@ namespace math{
 					for (int i = 0; i < M; i++)
 						data[idx] += m_data[r * M + i] * other_data[i * M2 + c];
 				}
+			return data;
+		}
+
+		template<int TN>
+		Matrix<TN, TN, T> ToSquare() {
+			T data[TN * TN] = { 0.0 };
+			int Rows = std::min<int>(TN, N);
+			int Cols = std::min<int>(TN, M);
+			for (int r = 0; r < Rows; r++)
+				for (int c = 0; c < Cols; c++) {
+					data[r * TN + c] = m_data[r * M + c];
+				}
+			int S = std::min<int>(Rows, Cols);
+			for (int i = S; i < TN; i++)
+				data[i * M + i] = 1.0f;
 			return data;
 		}
 
@@ -272,11 +287,113 @@ namespace math{
 		T m_data[N * M] = { 0.0 };
 	};
 
-	using Vector3f = Vector<3, float>;
-	using Vector4f = Vector<4, float>;
-	using Matrix4x4f = Matrix<4, 4, float>;
+	template<typename T> using Vector3 = Vector<3, T>;
+	template<typename T> using Vector4 = Vector<4, T>;
+	using Vector3f = Vector3<float>;
+	using Vector4f = Vector4<float>;
 	
+	template<typename T> using Matrix3x3 = Matrix<3, 3, T>;
+	template<typename T> using Matrix4x4 = Matrix<4, 4, T>;
+	using Matrix4x4f = Matrix4x4<float>;
+
+	template<typename T>
+	class Quaternion {
+	public:
+		Quaternion() {
+			SetIdentity();
+		}
+		Quaternion(Vector3<T> axis, T angle) {
+			// 约束：axis必须被归一化
+			T half_angle = (T)(0.5 * angle);
+			T sin_value = sin(half_angle);
+
+			x = axis.x * sin_value;
+			y = axis.y * sin_value;
+			z = axis.z * sin_value;
+			w = cos(half_angle);
+		}
 	
+		void SetIdentity()
+		{
+			Set(0, 0, 0, 1);
+		}
+
+		void Init(T _x = 0, T _y = 0, T _z = 0, T _w = 0)
+		{
+			Set(_x, _y, _z, _w);
+		}
+
+		void Set(T _x, T _y, T _z, T _w)
+		{
+			x = _x;
+			y = _y;
+			z = _z;
+			w = _w;
+		}
+
+		void GetAxisAngle(Vector3<T>& axis, T& angle)
+		{
+			// 约束：四元数必须被归一化
+			T half_angle = (T)acos(w);
+			angle = half_angle * 2;
+			T sin_value = (T)sin(half_angle);
+			axis.Set(x / sin_value, y / sin_value, z / sin_value);
+		}
+
+		void Negative()
+		{
+			for (int i = 0; i < 4; ++i)
+			{
+				q[i] = -q[i];
+			}
+		}
+
+		void ToRotationMatrix(Matrix3x3<T>& Rot) const
+		{
+			T fTx = x + x;
+			T fTy = y + y;
+			T fTz = z + z;
+			T fTwx = fTx * w;
+			T fTwy = fTy * w;
+			T fTwz = fTz * w;
+			T fTxx = fTx * x;
+			T fTxy = fTy * x;
+			T fTxz = fTz * x;
+			T fTyy = fTy * y;
+			T fTyz = fTz * y;
+			T fTzz = fTz * z;
+
+			Rot[0][0] = 1.0f - (fTyy + fTzz);
+			Rot[1][0] = fTxy - fTwz;
+			Rot[2][0] = fTxz + fTwy;
+			Rot[0][1] = fTxy + fTwz;
+			Rot[1][1] = 1.0f - (fTxx + fTzz);
+			Rot[2][1] = fTyz - fTwx;
+			Rot[0][2] = fTxz - fTwy;
+			Rot[1][2] = fTyz + fTwx;
+			Rot[2][2] = 1.0f - (fTxx + fTyy);
+		}
+
+		Matrix3x3<T> GetRotationMatrix() const {
+			Matrix3x3<T> Mat;
+			ToRotationMatrix(Mat);
+			return Mat;
+		}
+
+
+	private:
+		union
+		{
+			T q[4];
+			struct
+			{
+				T x, y, z, w;
+			};
+		};
+
+	};
+	
+	using Quaternionf = Quaternion<float>;
 
 
 }

@@ -35,11 +35,37 @@ public:
 		return mEulerRadian;
 	}
 
+	void Rotate(math::Vector3f EulerRadian) {
+		auto Position = GetPosition();
+		math::Quaternionf Q;
+		Q = math::Quaternionf(GetRight(), EulerRadian.x);
+		m_transform = Q.GetRotationMatrix().ToSquare<4>() * GetRotation();
+		Q = math::Quaternionf(GetUp(), EulerRadian.y);
+		m_transform = Q.GetRotationMatrix().ToSquare<4>() * GetRotation();
+		//m_transform = math::EulerToMatrix<float>(EulerRadian) * GetRotation();
+		SetPosition(Position);
+		ReOrtho();
+	}
+
+	void ReOrtho() {
+		//hold up is (0, 1, 0)
+		math::Vector3f Up = { 0.f, 1.f, 0.f };
+		auto Forward = GetForward();
+		auto Right = Up.Cross(Forward);
+		auto OrthoUp = Forward.Cross(Right);
+		auto Position = GetPosition();
+		m_transform = {
+			Right.x,	OrthoUp.x,	Forward.x,	Position.x,
+			Right.y,	OrthoUp.y,	Forward.y,	Position.y,
+			Right.z,	OrthoUp.z,	Forward.z,	Position.z,
+			0.0f,		0.0f,		0.0f,		1.0f
+		};
+	}
+
 	void UpdateTransform() {
 		auto Position = GetPosition();
-		m_transform = math::EulerToMatrix(mEulerRadian);
+		m_transform = math::EulerToMatrix<float>(mEulerRadian);
 		SetPosition(Position);
-
 	}
 
 	template<Direction dir>

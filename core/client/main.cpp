@@ -57,12 +57,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		camera.Move<Camera::RIGHT>(-dis);
 		break;
 		}
-	case GLFW_KEY_Q:
+	case GLFW_KEY_E:
 		{
 		camera.Move<Camera::UP>(dis);
 		break;
 		}
-	case GLFW_KEY_E:
+	case GLFW_KEY_Q:
 		{
 		camera.Move<Camera::UP>(-dis);
 		break;
@@ -78,7 +78,8 @@ static void cursor_callback(GLFWwindow* window, double x, double y)
 	//std::cout << x << " " << y << std::endl;
 	const float scale = 0.005;
 	if (can_ratate) {
-		camera.SetEulerRadian(camera.GetEulerRadian() + math::Vector3f{ -(float)(y - last_cury) * scale, -(float)(x - last_curx) * scale, 0.f });
+		//camera.SetEulerRadian(camera.GetEulerRadian() + math::Vector3f{ -(float)(y - last_cury) * scale, -(float)(x - last_curx) * scale, 0.f });
+		camera.Rotate( { -(float)(y - last_cury) * scale, -(float)(x - last_curx) * scale, 0.f } );
 	}
 	last_curx = x;
 	last_cury = y;
