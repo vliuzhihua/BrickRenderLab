@@ -42,6 +42,7 @@ public:
 		m_transform = Q.GetRotationMatrix().ToSquare<4>() * GetRotation();
 		Q = math::Quaternionf(GetUp(), EulerRadian.y);
 		m_transform = Q.GetRotationMatrix().ToSquare<4>() * GetRotation();
+		//why the code is wrong£¬
 		//m_transform = math::EulerToMatrix<float>(EulerRadian) * GetRotation();
 		SetPosition(Position);
 		ReOrtho();

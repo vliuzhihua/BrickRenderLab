@@ -12,6 +12,7 @@ out vec4 VO_LocalNormal;
 out vec4 VO_Texcoord0;
 out vec3 VO_PositionWorldSpace;
 
+
 void main()
 {
 	VO_PositionClipSpace = _ProjectionMatrix * _ViewMatrix * vec4(In_LocalPosition, 1.0);

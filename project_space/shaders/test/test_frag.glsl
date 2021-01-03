@@ -116,6 +116,8 @@ vec3 GammaToLinear(vec3 x)
 //         + Gs*Fs*Ds + .25*clearcoat*Gr*Fr*Dr;
 // }
 
+#include "shaders\\test\\test_common.glsl"
+
 void main()
 {	
 	float SunLightIrradiance = 1.0;
@@ -153,6 +155,7 @@ void main()
 	FragColor = texture(AlbedoTex, VO_Texcoord0.xy) * Fd;
 	FragColor = vec4(Fd) * 0.5;
 	FragColor = vec4(FinalColor * SunLightIrradiance, 1.0);
+	// FragColor = B;
 	// FragColor = vec4(Specular, 1.0);
 	// FragColor = vec4(SpecularColor, 1.);
 	// FragColor = vec4(NdL);

@@ -134,24 +134,85 @@ void FShader::SetMatrix4x4(const std::string& Name, const float* Value) const {
     glUniformMatrix4fv(glGetUniformLocation(mID, Name.c_str()), 1, true, Value);
 }
 
-bool FShader::CreateShader(GLuint ShaderType, const char* Path, GLuint& ShaderId) {
-    std::string ShaderCode;
-    std::ifstream vShaderFile;
-    // 保证ifstream对象可以抛出异常：
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    try
-    {
+bool GetFileContent(const char* Path, std::string& Content) {
+    std::ifstream FileHandle;
+    FileHandle.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try{
         // 打开文件
-        vShaderFile.open(Path);
+        FileHandle.open(Path);
         std::stringstream vShaderStream, fShaderStream;
         // 读取文件的缓冲内容到数据流中
-        vShaderStream << vShaderFile.rdbuf();
+        vShaderStream << FileHandle.rdbuf();
         // 关闭文件处理器
-        vShaderFile.close();
+        FileHandle.close();
         // 转换数据流到string
-        ShaderCode = vShaderStream.str();
+        Content = vShaderStream.str();
+        return true;
     }
-    catch (std::ifstream::failure e)
+    catch (std::ifstream::failure e) {
+        return false;
+    }
+}
+
+std::vector<std::string> SplitString(const std::string S, std::string MatchC) {
+    std::vector<std::string> Result;
+    std::string::size_type pos1, pos2;
+    pos2 = S.find(MatchC);
+    pos1 = 0;
+    while (std::string::npos != pos2)
+    {
+        Result.push_back(S.substr(pos1, pos2 - pos1 + MatchC.size()));
+
+        pos1 = pos2 + MatchC.size();
+        pos2 = S.find(MatchC, pos1);
+    }
+    if (pos1 != S.length())
+        Result.push_back(S.substr(pos1));
+    return Result;
+}
+
+std::string TrimStr(std::string str, const std::string& val)
+{
+    str.erase(0, str.find_first_not_of(val));
+    str.erase(str.find_last_not_of(val) + val.size());
+    return  str;
+}
+
+static bool FillShaderCode(const char* Path, std::string& Content) {
+    //解析include语法
+    std::string TmpCode;
+    if (!GetFileContent(Path, TmpCode)) {
+        std::cout << "File: " << Path << "Not Found!!" << std::endl;
+        return false;
+    }
+    auto Lines = SplitString(TmpCode, "\n");
+    for (auto Line : Lines) {
+        std::string LineTrimed = TrimStr(Line, " ");
+        size_t idx = LineTrimed.find("#include ");
+        if (idx != -1) {
+            std::string IncludePath = LineTrimed.substr(idx + 8);
+            IncludePath = TrimStr(IncludePath, " ");
+            IncludePath = TrimStr(IncludePath, "\n");
+            IncludePath = TrimStr(IncludePath, "\"");
+            //判断没有被注释
+            if (LineTrimed[0] == '\\' || LineTrimed[1] == '\\') {
+                Content += Line;
+            }
+            else {
+                if (!FillShaderCode(IncludePath.c_str(), Content))
+                    return false;
+            }
+        }
+        else {
+            Content += Line;
+        }
+    }
+    return true;
+}
+
+bool FShader::CreateShader(GLuint ShaderType, const char* Path, GLuint& ShaderId) {
+    std::string ShaderCode;
+    if(!FillShaderCode(Path, ShaderCode))
     {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ\n " << "ShaderType: " << ShaderTypeName[ShaderType] << "\nPath: " << Path << std::endl;
         return false;
