@@ -10,6 +10,7 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "math/GraphicsMath.h"
+#include "DeviceResource.h"
 
 FModel* Model = nullptr;
 Texture* AlbedoTex = nullptr;
@@ -17,6 +18,8 @@ Texture* NormalTex = nullptr;
 Texture* AoTex = nullptr;
 Texture* RoughnessTex = nullptr;
 Texture* SpecularTex = nullptr;
+
+brick::DeviceBuffer* gUniformBuffer = nullptr;
 
 namespace brick {
 
@@ -37,6 +40,17 @@ void SetTexture(unsigned int SlotIndex, const char* ParamName, Texture* Tex, FSh
 	Shader->SetInt(ParamName, SlotIndex);
 }
 
+void SetConstantBufer(unsigned int slotIndex, const char* ParamName, DeviceBuffer* buffer, FShader* shader) {
+	glBindBufferBase(GL_UNIFORM_BUFFER, slotIndex, buffer->GetBufferObject());
+	shader->SetConstantBuffer(ParamName, slotIndex);
+}
+
+void SetDynamicBufer(unsigned int slotIndex, const char* ParamName, DeviceBuffer* buffer, FShader* shader) {
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, slotIndex, buffer->GetBufferObject());
+	shader->SetDynamicBuffer(ParamName, slotIndex);
+}
+
+
 void Renderer::PrepareRender()
 {
 	//std::string file_name = "res/models/brick_rough_ue4ifa0va/ue4ifa0va__LOD0.obj";
@@ -55,6 +69,10 @@ void Renderer::PrepareRender()
 
 	SpecularTex = new Texture();
 	SpecularTex->Init("res\\models\\edible_fruit_ujcxeblva\\ujcxeblva_4K_Specular.jpg");
+
+	gUniformBuffer = new DeviceBuffer();
+	float data[] = { 1.0, 10.0 };
+	gUniformBuffer->Init(sizeof(data), data);
 }
 
 void Renderer::Render(const Camera& cam)
@@ -91,6 +109,9 @@ void Renderer::Render(const Camera& cam)
 	SetTexture(1, "NormalTex", NormalTex, RealShader);
 	SetTexture(2, "RoughnessTex", RoughnessTex, RealShader);
 	SetTexture(3, "SpecularTex", SpecularTex, RealShader);
+
+	SetConstantBufer(0, "UniformBuffer", gUniformBuffer, RealShader);
+	SetDynamicBufer(0, "DynamicBuffer", gUniformBuffer, RealShader);
 
 	ImmediateRenderModel(Model);
 	//glDrawElements(GL_TRIANGLES, shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, 0);

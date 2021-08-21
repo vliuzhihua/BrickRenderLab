@@ -23,6 +23,9 @@ public:
     void SetFloat(const std::string& Name, const float Value) const;
     void SetFloat4(const std::string& Name, const float* Value) const;
     void SetMatrix4x4(const std::string& Name, const float* Value) const;
+
+    void SetConstantBuffer(const std::string& Name, const int Value) const;
+    void SetDynamicBuffer(const std::string& Name, const int Value) const;
    
 protected:
     // bulid shader, ony called by FShaderManager

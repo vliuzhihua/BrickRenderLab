@@ -134,6 +134,14 @@ void FShader::SetMatrix4x4(const std::string& Name, const float* Value) const {
     glUniformMatrix4fv(glGetUniformLocation(mID, Name.c_str()), 1, true, Value);
 }
 
+void FShader::SetConstantBuffer(const std::string& Name, const int Value) const {
+    glUniformBlockBinding(mID, glGetUniformLocation(mID, Name.c_str()), Value);
+}
+
+void FShader::SetDynamicBuffer(const std::string& Name, const int Value) const {
+    glShaderStorageBlockBinding(mID, glGetUniformLocation(mID, Name.c_str()), Value);
+}
+
 bool GetFileContent(const char* Path, std::string& Content) {
     std::ifstream FileHandle;
     FileHandle.exceptions(std::ifstream::failbit | std::ifstream::badbit);
