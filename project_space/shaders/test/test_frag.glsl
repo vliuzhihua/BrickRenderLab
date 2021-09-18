@@ -13,14 +13,22 @@ uniform sampler2D SpecularTex;
 
 uniform vec4 _CameraPosition;
 
-layout (binding = 0) buffer DynamicBuffer
+uniform vec4 UselessUniform;
+
+
+layout (binding = 0, std140) buffer DynamicBuffer
 {
-	float DynamicValue[2];
+	vec4 DynamicValue[2];
 }; 
 
-layout(std140, binding = 0) uniform UniformBuffer
+layout(binding = 3, std140) uniform UniformBuffer
 {
-	float ConstValue[2];
+	vec4 ConstValue[2];
+};
+
+layout(binding = 2, std140) uniform UniformBuffer2
+{
+	float TestConstValue[4];
 };
 
 const float PI = 3.14159265358979323846;
@@ -161,7 +169,7 @@ void main()
 
 	vec3 FinalColor = Diffuse + Specular;
 
-	DynamicValue[0] = 2.0;
+	DynamicValue[1] = vec4(0.1);
 
 	FragColor = texture(AlbedoTex, VO_Texcoord0.xy) * Fd;
 	FragColor = vec4(Fd) * 0.5;
@@ -170,6 +178,7 @@ void main()
 	// FragColor = vec4(Specular, 1.0);
 	// FragColor = vec4(SpecularColor, 1.);
 	// FragColor = vec4(NdL);
+	FragColor = ConstValue[1];
 
 	// FragColor = vec4(PerceptualRoughness);
 

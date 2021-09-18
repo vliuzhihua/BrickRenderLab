@@ -26,6 +26,8 @@ public:
 
     void SetConstantBuffer(const std::string& Name, const int Value) const;
     void SetDynamicBuffer(const std::string& Name, const int Value) const;
+
+    void PrintShaderInfo() const;
    
 protected:
     // bulid shader, ony called by FShaderManager

@@ -81,6 +81,8 @@ void FShader::Init(const char* iVertexPath, const char* iFragmentPath) {
     // 删除着色器，它们已经链接到我们的程序中了，已经不再需要了
     glDeleteShader(VertexShader);
     glDeleteShader(FragShader);
+
+    PrintShaderInfo();
 }
 
 FShader::~FShader() {
@@ -135,11 +137,66 @@ void FShader::SetMatrix4x4(const std::string& Name, const float* Value) const {
 }
 
 void FShader::SetConstantBuffer(const std::string& Name, const int Value) const {
-    glUniformBlockBinding(mID, glGetUniformLocation(mID, Name.c_str()), Value);
+    glUniformBlockBinding(mID, glGetUniformBlockIndex(mID, Name.c_str()), Value);
 }
 
 void FShader::SetDynamicBuffer(const std::string& Name, const int Value) const {
-    glShaderStorageBlockBinding(mID, glGetUniformLocation(mID, Name.c_str()), Value);
+    glShaderStorageBlockBinding(mID, glGetUniformBlockIndex(mID, Name.c_str()), Value);
+}
+
+void FShader::PrintShaderInfo() const {
+	/* NOTE: uniform blocks that shader never access will be ignored */
+	GLint uniform_count = 0;
+	//glad_glGetProgramInterfaceiv()
+	glGetProgramiv(mID, GL_ACTIVE_UNIFORMS, &uniform_count);
+	const int NAME_LENGTH = 64;
+	char uniform_name[NAME_LENGTH] = "";
+	int name_len = -1;
+	uint32_t defaultUniformBufferOffset = 0;
+	for(GLuint idx = 0; idx < uniform_count; ++idx)
+	{
+		GLint  bufferIndex = -1;
+		GLint  bufferOffset = -1;
+
+		glGetActiveUniformsiv(mID, 1, &idx, GL_UNIFORM_BLOCK_INDEX, &bufferIndex);
+		glGetActiveUniformsiv(mID, 1, &idx, GL_UNIFORM_OFFSET, &bufferOffset);
+		
+		int num = -1;
+		GLenum gl_type = GL_ZERO;
+		glGetActiveUniform(mID, idx, NAME_LENGTH, &name_len, &num, &gl_type, uniform_name);
+		char* uname = uniform_name;
+
+		char* p = strstr(uniform_name, ".");
+		if (p != NULL)
+		{
+			uname = p + 1;
+			name_len = name_len - (int)(uname - uniform_name);
+		}
+
+		char* p1 = strstr(uname, "[");
+		if (p1 != NULL)
+			name_len = (int)(p1 - uname);
+
+		GLint location = glGetUniformLocation(mID, uniform_name);
+
+
+        std::cout << "UniformBuffer location " << glGetUniformBlockIndex(mID, "UniformBuffer") <<std::endl;; 
+        std::cout << "UniformBuffer2 location " << glGetUniformBlockIndex(mID, "UniformBuffer2") <<std::endl;; 
+
+        //GetActiveUniformBlockParameter
+        int size;
+        char ubo_name[NAME_LENGTH];
+        glad_glGetActiveUniformBlockName(mID, bufferIndex, NAME_LENGTH, &size, ubo_name);
+
+        std::cout << "UNIFORM name " << uniform_name <<std::endl;
+        std::cout << "GL_UNIFORM_BLOCK_INDEX " << bufferIndex << " UBO name: " << ubo_name <<std::endl;
+        std::cout << "GL_UNIFORM_OFFSET " << bufferOffset <<std::endl;
+        std::cout << "type " << gl_type <<std::endl;
+        std::cout << "type num " << num <<std::endl;
+        std::cout << "location " << location <<std::endl;
+
+	}
+
 }
 
 bool GetFileContent(const char* Path, std::string& Content) {

@@ -71,7 +71,7 @@ void Renderer::PrepareRender()
 	SpecularTex->Init("res\\models\\edible_fruit_ujcxeblva\\ujcxeblva_4K_Specular.jpg");
 
 	gUniformBuffer = new DeviceBuffer();
-	float data[] = { 1.0, 10.0 };
+	float data[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 	gUniformBuffer->Init(sizeof(data), data);
 }
 
